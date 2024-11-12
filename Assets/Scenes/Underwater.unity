@@ -9530,7 +9530,7 @@ Rigidbody:
   m_GameObject: {fileID: 7843075971899524587}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 10
+  m_Drag: 1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -26422,6 +26422,7 @@ MonoBehaviour:
   isRightHand: 1
   chain: {fileID: 1011414072}
   isColliding: 0
+  isRepeatable: 0
   rightHandGrabAPI: {fileID: 5090581929193140440}
   leftHandGrabAPI: {fileID: 3566707063543920755}
 --- !u!135 &5268131226228957601
@@ -36430,6 +36431,7 @@ MonoBehaviour:
   isRightHand: 0
   chain: {fileID: 1011414072}
   isColliding: 0
+  isRepeatable: 0
   rightHandGrabAPI: {fileID: 8978064071348360711}
   leftHandGrabAPI: {fileID: 8820883436664422041}
 --- !u!135 &7244374335742018460
@@ -37119,6 +37121,7 @@ MonoBehaviour:
   isRightHand: 0
   chain: {fileID: 1011414072}
   isColliding: 0
+  isRepeatable: 0
   rightHandGrabAPI: {fileID: 5090581929193140440}
   leftHandGrabAPI: {fileID: 3566707063543920755}
 --- !u!1 &7376926716293298125
@@ -40849,6 +40852,9 @@ MonoBehaviour:
   - {fileID: 7244374335742018459}
   - {fileID: 5268131226228957600}
   PlayerControllerTransform: {fileID: 7665551815106715042}
+  speed: 5
+  headCollider: {fileID: 4124176687732609112}
+  headTransform: {fileID: 9176002356476235237}
 --- !u!4 &7849651263538688494
 Transform:
   m_ObjectHideFlags: 0
@@ -48434,6 +48440,7 @@ MonoBehaviour:
   isRightHand: 1
   chain: {fileID: 1011414072}
   isColliding: 0
+  isRepeatable: 0
   rightHandGrabAPI: {fileID: 5090581929193140440}
   leftHandGrabAPI: {fileID: 3566707063543920755}
 --- !u!1 &8721589413908552597
