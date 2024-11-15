@@ -5,7 +5,7 @@ public class ChoiceEndingScript : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
-    public GameObject reality, dream, door_closed, door_opened, pills, mask;
+    public GameObject reality, dream, door_closed, door_opened, pills, mask, beep;
     void Start()
     {
         
@@ -26,6 +26,7 @@ public class ChoiceEndingScript : MonoBehaviour
 
         reality.SetActive(false);
         dream.SetActive(true);
+        beep.GetComponent<AudioSource>().Stop();
     }
 
     public void ChooseReality()
