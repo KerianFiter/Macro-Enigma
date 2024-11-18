@@ -6,7 +6,8 @@ public class BlackoutManager : MonoBehaviour
     
     [SerializeField] private List<GameObject> disableOnBlackout;
     [SerializeField] private List<GameObject> enableOnBlackout;
-
+    [SerializeField] private List<GameObject> disableOnLightsOn;
+    [SerializeField] private List<GameObject> enableOnLightsOn;
     [SerializeField] private Color ambiantColor;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -46,6 +47,14 @@ public class BlackoutManager : MonoBehaviour
             item.SetActive(true);
         }
         foreach (var item in enableOnBlackout)
+        {
+            item.SetActive(false);
+        }
+        foreach (var item in enableOnLightsOn)
+        {
+            item.SetActive(true);
+        }
+        foreach (var item in disableOnLightsOn)
         {
             item.SetActive(false);
         }

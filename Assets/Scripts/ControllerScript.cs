@@ -30,7 +30,7 @@ public class ControllerScript : MonoBehaviour
         Vector3 right = headTransform.right * thumbstick.x * step;
         Vector3 movement = forward + right;
 
-        rb.AddForce(movement, ForceMode.Force);
+        rb.AddForce(movement, ForceMode.Impulse);
 
         // Rotate the player based on button presses
         if (OVRInput.GetDown(OVRInput.RawButton.X))

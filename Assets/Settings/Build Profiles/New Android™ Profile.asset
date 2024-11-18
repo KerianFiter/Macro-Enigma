@@ -172,10 +172,6 @@ MonoBehaviour:
         2}'
     - line: '|   - {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b,
         type: 3}'
-    - line: '|   - {fileID: -6613037429635783491, guid: 4a0028a3399f98e4eb6c2ced42a1623e,
-        type: 2}'
-    - line: '|   - {fileID: 11400000, guid: c5008e46fa737a54c8321a7c2ba114cd, type:
-        2}'
     - line: '|   metroInputSource: 0'
     - line: '|   wsaTransparentSwapchain: 0'
     - line: '|   m_HolographicPauseOnTrackingLoss: 1'
@@ -206,7 +202,7 @@ MonoBehaviour:
     - line: '|     iPhone: 0'
     - line: '|     tvOS: 0'
     - line: '|   overrideDefaultApplicationIdentifier: 0'
-    - line: '|   AndroidBundleVersionCode: 1'
+    - line: '|   AndroidBundleVersionCode: 4'
     - line: '|   AndroidMinSdkVersion: 29'
     - line: '|   AndroidTargetSdkVersion: 32'
     - line: '|   AndroidPreferredInstallLocation: 0'
@@ -895,7 +891,7 @@ MonoBehaviour:
     - line: '|   suppressCommonWarnings: 1'
     - line: '|   allowUnsafeCode: 0'
     - line: '|   useDeterministicCompilation: 1'
-    - line: '|   additionalIl2CppArgs: '
+    - line: '|   additionalIl2CppArgs: --compiler-flags="     -flto=thin"'
     - line: '|   scriptingRuntimeVersion: 1'
     - line: '|   gcIncremental: 1'
     - line: '|   gcWBarrierValidation: 0'
@@ -1019,7 +1015,7 @@ MonoBehaviour:
         m_ExportAsGoogleAndroidProject: 0
         m_DebugSymbolLevel: 1
         m_DebugSymbolFormat: 5
-        m_CurrentDeploymentTargetId: __builtin__target_default
+        m_CurrentDeploymentTargetId: 2G0YC5ZG6B00FX
         m_BuildType: 2
         m_BuildAppBundle: 0
         m_IPAddressToConnect: 

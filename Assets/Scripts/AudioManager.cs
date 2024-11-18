@@ -11,6 +11,7 @@ public class AudioManager : MonoBehaviour
         public string id;
         public AudioClip audioClip; 
         public float delay;  
+        public float volume;
     }
 
     public List<AudioDelayPair> audioDelayPairs = new List<AudioDelayPair>();
@@ -45,8 +46,8 @@ public class AudioManager : MonoBehaviour
             if (pair.audioClip != null)
             {
                 yield return new WaitForSeconds(pair.delay);
-
-                PlayClip(pair.audioClip);
+                
+                PlayClip(pair.audioClip, pair.volume);
                 Debug.Log("Playing " + pair.audioClip.name + " after " + pair.delay + " seconds delay.");
             }
             else
@@ -56,9 +57,10 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void PlayClip(AudioClip clip)
+    private void PlayClip(AudioClip clip, float volume = 1.0f)
     {
         AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.volume = volume;
         audioSource.clip = clip;
         audioSource.Play();
 
