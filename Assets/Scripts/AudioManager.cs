@@ -1,31 +1,43 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class AudioManager : MonoBehaviour
 {
+    public static AudioManager Instance;
+    
     // Define a struct to store the AudioClip, ID, and delay pair
     [System.Serializable]
     public struct AudioDelayPair
     {
         public string id;
-        public AudioClip audioClip; 
+        public List<AudioClip> audioClip; 
         public float delay;  
         public float volume;
+        public bool spatialize;
+        public Transform spatializeTransform;
+        public bool playOnlyOnce;
+        public bool loop;
     }
 
-    public List<AudioDelayPair> audioDelayPairs = new List<AudioDelayPair>();
-
-    private Dictionary<string, AudioDelayPair> audioDictionary;
-
+    [SerializeField]
+    private List<AudioDelayPair> audioDelayPairs = new List<AudioDelayPair>();
+    private Dictionary<string, AudioDelayPair> _audioDictionary;
+    private AudioSource _backgroundAudioSource;
+    
     void Awake()
     {
-        audioDictionary = new Dictionary<string, AudioDelayPair>();
+        Instance = this;
+        _audioDictionary = new Dictionary<string, AudioDelayPair>();
         foreach (var pair in audioDelayPairs)
         {
-            if (!audioDictionary.ContainsKey(pair.id))
+            if (!_audioDictionary.ContainsKey(pair.id))
             {
-                audioDictionary.Add(pair.id, pair);
+                _audioDictionary.Add(pair.id, pair);
             }
             else
             {
@@ -36,19 +48,41 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(PlayAudioWithDelays());
+        if(SceneManager.GetActiveScene().name == "Main")
+        {
+            PlayAudio("ou_est_ce_que_jai_aterri");
+            PlayAudio("BGNoLights");
+            
+        }
+        else if(SceneManager.GetActiveScene().name == "Underwater")
+        {
+            PlayAudio("BG");
+            PlayAudio("leviathan");
+        }
+
     }
 
-    private IEnumerator PlayAudioWithDelays()
+    public void PlayAudio(string id)
     {
-        foreach (var pair in audioDelayPairs)
+        bool background = id.Contains("BG");
+        StartCoroutine(PlayAudioCoroutine(id, background));
+    }
+    private IEnumerator PlayAudioCoroutine(string id, bool background = false)
+    {
+        if (_audioDictionary.ContainsKey(id))
         {
-            if (pair.audioClip != null)
+            AudioDelayPair pair = _audioDictionary[id];
+            if(PlayerPrefs.HasKey(id) && pair.playOnlyOnce)
+            {
+                yield break;
+            }
+            PlayerPrefs.SetInt(id, 1);
+            if (pair.audioClip.Count > 0)
             {
                 yield return new WaitForSeconds(pair.delay);
-                
-                PlayClip(pair.audioClip, pair.volume);
-                Debug.Log("Playing " + pair.audioClip.name + " after " + pair.delay + " seconds delay.");
+                AudioClip clip = pair.audioClip[Random.Range(0, pair.audioClip.Count)];
+                PlayClip(clip, pair.loop, pair.spatialize, pair.spatializeTransform, pair.volume, background);
+                Debug.Log("Playing " + clip.name + " after " + pair.delay + " seconds delay.");
             }
             else
             {
@@ -57,13 +91,33 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void PlayClip(AudioClip clip, float volume = 1.0f)
+    private void PlayClip(AudioClip clip, bool loop, bool spatialize, Transform spatializeTransform, float volume = 1.0f,  bool background = false)
     {
-        AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+        if(background && _backgroundAudioSource != null)
+        {
+            Destroy(_backgroundAudioSource);
+        }
+        if (!spatializeTransform)
+        {
+            spatializeTransform = transform;
+        }
+        AudioSource audioSource = spatializeTransform.AddComponent<AudioSource>();
+        if (background)
+        {
+            _backgroundAudioSource = audioSource;
+        }
+        if (spatialize)
+        { 
+            audioSource.spatialBlend = 1.0f;
+        }
+        audioSource.spatialize = spatialize;
         audioSource.volume = volume;
         audioSource.clip = clip;
+        audioSource.loop = loop;
         audioSource.Play();
-
-        Destroy(audioSource, clip.length);
+        if (!loop)
+        {
+            Destroy(audioSource, clip.length);
+        }
     }
 }

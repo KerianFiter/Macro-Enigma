@@ -9,19 +9,20 @@ public class UnderwaterController : MonoBehaviour
     public Transform PlayerControllerTransform;
     Vector3 initialLeftHandPosition = Vector3.zero;
     Vector3 initialRightHandPosition = Vector3.zero;
-    
+
     public float speed = 5.0f;
     private Rigidbody rb;
     public CapsuleCollider headCollider;
     public Transform headTransform;
 
-    // Start is called before the first frame update
+    private bool isSwimming = false;
+    private bool chainSoundPlayed = false;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         // NAGE
@@ -36,24 +37,44 @@ public class UnderwaterController : MonoBehaviour
         Vector3 right = headTransform.right * thumbstick.x * step;
         Vector3 movement = forward + right;
 
-        rb.AddForce(movement, ForceMode.Force);
+        // Apply movement force and play "swim" sound if moving
+        if (movement.magnitude > 0.01f)
+        {
+            rb.AddForce(movement, ForceMode.Force);
 
-        // Rotate the player based on button presses
+            if (!isSwimming)
+            {
+                AudioManager.Instance.PlayAudio("swim");
+                isSwimming = true;
+            }
+        }
+        else
+        {
+            isSwimming = false;
+        }
+
+        // Rotate the player based on button presses / right joystick
         if (OVRInput.GetDown(OVRInput.RawButton.X))
         {
             transform.rotation *= Quaternion.Euler(0, -30, 0);
         }
-
         if (OVRInput.GetDown(OVRInput.RawButton.Y))
         {
             transform.rotation *= Quaternion.Euler(0, 30, 0);
         }
-        
-        // UNDERWATER
+        if (OVRInput.GetDown(OVRInput.Button.SecondaryThumbstickLeft))
+        {
+            transform.rotation *= Quaternion.Euler(0, -30, 0);
+        }
+        if (OVRInput.GetDown(OVRInput.Button.SecondaryThumbstickRight))
+        {
+            transform.rotation *= Quaternion.Euler(0, 30, 0);
+        }
+
+        // UNDERWATER logic with chain grabbing
         bool hasCollided = false;
         for (int i = 0; i < chainControllers.Count; i++)
         {
-            // On essaye de répéter un Grab sur la chaîne
             if (chainControllers[i].isColliding)
             {
                 hasCollided = true;
@@ -70,18 +91,20 @@ public class UnderwaterController : MonoBehaviour
                 }
             }
         }
-        
+
         if (!hasCollided)
         {
             previousActiveIndex = -1;
             initialLeftHandPosition = Vector3.zero;
             initialRightHandPosition = Vector3.zero;
+            chainSoundPlayed = false;
             return;
         }
-        
+
+        // Check for left or right hand grabbing and play "chain" sound once at the start of grab
         if (!chainControllers[previousActiveIndex].isRightHand)
         {
-            if(OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.8f || chainControllers[previousActiveIndex].leftHandGrabAPI.IsHandPalmGrabbing(GrabbingRule.FullGrab))
+            if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.8f || chainControllers[previousActiveIndex].leftHandGrabAPI.IsHandPalmGrabbing(GrabbingRule.FullGrab))
             {
                 Vector3 leftHandGlobalPosition = PlayerControllerTransform.TransformPoint(OVRInput.GetLocalControllerPosition(OVRInput.Controller.LHand));
                 
@@ -89,17 +112,24 @@ public class UnderwaterController : MonoBehaviour
                 {
                     initialLeftHandPosition = leftHandGlobalPosition;
                 }
-                
+
                 PlayerControllerTransform.transform.position += initialLeftHandPosition - leftHandGlobalPosition;
+
+                if (!chainSoundPlayed)
+                {
+                    AudioManager.Instance.PlayAudio("chain");
+                    chainSoundPlayed = true;
+                }
             }
             else
             {
                 initialLeftHandPosition = Vector3.zero;
+                chainSoundPlayed = false;
             }
         }
         else
         {
-            if(OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.8f || chainControllers[previousActiveIndex].rightHandGrabAPI.IsHandPalmGrabbing(GrabbingRule.FullGrab))
+            if (OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.8f || chainControllers[previousActiveIndex].rightHandGrabAPI.IsHandPalmGrabbing(GrabbingRule.FullGrab))
             {
                 Vector3 rightHandGlobalPosition = PlayerControllerTransform.TransformPoint(OVRInput.GetLocalControllerPosition(OVRInput.Controller.RHand));
                 
@@ -107,12 +137,19 @@ public class UnderwaterController : MonoBehaviour
                 {
                     initialRightHandPosition = rightHandGlobalPosition;
                 }
-                
+
                 PlayerControllerTransform.transform.position += initialRightHandPosition - rightHandGlobalPosition;
+
+                if (!chainSoundPlayed)
+                {
+                    AudioManager.Instance.PlayAudio("chain");
+                    chainSoundPlayed = true;
+                }
             }
             else
             {
                 initialRightHandPosition = Vector3.zero;
+                chainSoundPlayed = false;
             }
         }
     }

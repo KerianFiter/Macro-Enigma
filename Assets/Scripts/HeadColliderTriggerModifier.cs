@@ -6,7 +6,6 @@ public class HeadColliderTriggerModifier : MonoBehaviour
     
     public void EnableCollision()
     {
-        print("hello");
         isCollisionEnabled = true;
     }
     

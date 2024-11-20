@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class HeadPosition : MonoBehaviour
 {
-    public Transform centerEye;
+    [SerializeField] private Transform centerEye;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

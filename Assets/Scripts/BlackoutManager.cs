@@ -1,26 +1,24 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class BlackoutManager : MonoBehaviour
 {
-    
+    public static BlackoutManager Instance;
     [SerializeField] private List<GameObject> disableOnBlackout;
+    [SerializeField] private List<MeshRenderer> disableOnBlackoutRenderers;
     [SerializeField] private List<GameObject> enableOnBlackout;
     [SerializeField] private List<GameObject> disableOnLightsOn;
     [SerializeField] private List<GameObject> enableOnLightsOn;
     [SerializeField] private Color ambiantColor;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    private void Awake()
     {
-        Blackout();
+        Instance = this;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void Blackout()
     {
@@ -30,6 +28,10 @@ public class BlackoutManager : MonoBehaviour
         foreach (var item in disableOnBlackout)
         {
             item.SetActive(false);
+        }
+        foreach (var item in disableOnBlackoutRenderers)
+        {
+            item.enabled = false;
         }
         foreach (var item in enableOnBlackout)
         {
@@ -57,6 +59,10 @@ public class BlackoutManager : MonoBehaviour
         foreach (var item in disableOnLightsOn)
         {
             item.SetActive(false);
+        }
+        foreach (var item in disableOnBlackoutRenderers)
+        {
+            item.enabled = true;
         }
     }
 }
