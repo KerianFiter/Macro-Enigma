@@ -1,19 +1,17 @@
-using System;
 using UnityEngine;
-
 public class RespawnIfUnderWorld : MonoBehaviour
 {
+    private bool _isRbKinematic;
 
     private Rigidbody _rb;
-    private bool _isRbKinematic;
     private Vector3 _respawnPosition;
-    
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
     }
 
-    void Start()
+    private void Start()
     {
         _isRbKinematic = _rb.isKinematic;
         _respawnPosition = transform.position;

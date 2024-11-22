@@ -1,14 +1,13 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
-
 public class LeviathanTrigger : MonoBehaviour
 {
-    [SerializeField] private float delayBeforeSceneChange = 3;
-    [SerializeField] Animator leviathanAnimator;
 
     private static readonly int AttackTrigger = Animator.StringToHash("Attack");
+    [SerializeField] private float delayBeforeSceneChange = 3;
+    [SerializeField]
+    private Animator leviathanAnimator;
 
     public void TriggerLeviathan()
     {

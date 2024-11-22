@@ -1,7 +1,6 @@
 using System;
 using TMPro;
 using UnityEngine;
-
 public class WatchDepthUpdater : MonoBehaviour
 {
     [SerializeField] private TextMeshPro depthText;

@@ -1,59 +1,55 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Oculus.Interaction.GrabAPI;
-
+using UnityEngine;
+using UnityEngine.Serialization;
 public class UnderwaterController : MonoBehaviour
 {
-    public List<ChainController> chainControllers;
-    private int previousActiveIndex = 0;
-    public Transform PlayerControllerTransform;
-    Vector3 initialLeftHandPosition = Vector3.zero;
-    Vector3 initialRightHandPosition = Vector3.zero;
+    [SerializeField] private List<ChainController> chainControllers;
+    [FormerlySerializedAs("PlayerControllerTransform")]
+    [SerializeField] private Transform playerControllerTransform;
 
-    public float speed = 5.0f;
-    private Rigidbody rb;
-    public CapsuleCollider headCollider;
-    public Transform headTransform;
+    [SerializeField] private float speed = 5.0f;
+    [SerializeField] private CapsuleCollider headCollider;
+    [SerializeField] private Transform headTransform;
+    private bool _chainSoundPlayed;
+    private Vector3 _initialLeftHandPosition = Vector3.zero;
+    private Vector3 _initialRightHandPosition = Vector3.zero;
 
-    private bool isSwimming = false;
-    private bool chainSoundPlayed = false;
+    private bool _isSwimming;
+    private int _previousActiveIndex;
+    private Rigidbody _rb;
 
-    void Awake()
+    private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        _rb = GetComponent<Rigidbody>();
     }
 
-    void Update()
+    private void Update()
     {
-        // NAGE
         Vector2 thumbstick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
-    
-        // Set collider trigger based on thumbstick movement
+
         headCollider.isTrigger = thumbstick == Vector2.zero;
 
-        // Calculate movement based on head forward direction
         float step = Time.deltaTime * speed;
         Vector3 forward = headTransform.forward * thumbstick.y * step;
         Vector3 right = headTransform.right * thumbstick.x * step;
         Vector3 movement = forward + right;
 
-        // Apply movement force and play "swim" sound if moving
         if (movement.magnitude > 0.01f)
         {
-            rb.AddForce(movement, ForceMode.Force);
+            _rb.AddForce(movement, ForceMode.Force);
 
-            if (!isSwimming)
+            if (!_isSwimming)
             {
                 AudioManager.Instance.PlayAudio("swim");
-                isSwimming = true;
+                _isSwimming = true;
             }
         }
         else
         {
-            isSwimming = false;
+            _isSwimming = false;
         }
 
-        // Rotate the player based on button presses / right joystick
         if (OVRInput.GetDown(OVRInput.RawButton.X))
         {
             transform.rotation *= Quaternion.Euler(0, -30, 0);
@@ -71,22 +67,21 @@ public class UnderwaterController : MonoBehaviour
             transform.rotation *= Quaternion.Euler(0, 30, 0);
         }
 
-        // UNDERWATER logic with chain grabbing
         bool hasCollided = false;
         for (int i = 0; i < chainControllers.Count; i++)
         {
             if (chainControllers[i].isColliding)
             {
                 hasCollided = true;
-                if (i != previousActiveIndex)
+                if (i != _previousActiveIndex)
                 {
-                    if (previousActiveIndex != -1)
+                    if (_previousActiveIndex != -1)
                     {
-                        chainControllers[previousActiveIndex].isColliding = false;
-                        initialLeftHandPosition = Vector3.zero;
-                        initialRightHandPosition = Vector3.zero;
+                        chainControllers[_previousActiveIndex].isColliding = false;
+                        _initialLeftHandPosition = Vector3.zero;
+                        _initialRightHandPosition = Vector3.zero;
                     }
-                    previousActiveIndex = i;
+                    _previousActiveIndex = i;
                     break;
                 }
             }
@@ -94,62 +89,64 @@ public class UnderwaterController : MonoBehaviour
 
         if (!hasCollided)
         {
-            previousActiveIndex = -1;
-            initialLeftHandPosition = Vector3.zero;
-            initialRightHandPosition = Vector3.zero;
-            chainSoundPlayed = false;
+            _previousActiveIndex = -1;
+            _initialLeftHandPosition = Vector3.zero;
+            _initialRightHandPosition = Vector3.zero;
+            _chainSoundPlayed = false;
             return;
         }
 
-        // Check for left or right hand grabbing and play "chain" sound once at the start of grab
-        if (!chainControllers[previousActiveIndex].isRightHand)
+        if (!chainControllers[_previousActiveIndex].isRightHand)
         {
-            if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.8f || chainControllers[previousActiveIndex].leftHandGrabAPI.IsHandPalmGrabbing(GrabbingRule.FullGrab))
+            if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.8f || chainControllers[_previousActiveIndex].leftHandGrabAPI.IsHandPalmGrabbing(GrabbingRule.FullGrab))
             {
-                Vector3 leftHandGlobalPosition = PlayerControllerTransform.TransformPoint(OVRInput.GetLocalControllerPosition(OVRInput.Controller.LHand));
-                
-                if (initialLeftHandPosition == Vector3.zero)
+                Vector3 leftHandGlobalPosition = playerControllerTransform.TransformPoint(OVRInput.GetLocalControllerPosition(OVRInput.Controller.LHand));
+
+                if (_initialLeftHandPosition == Vector3.zero)
                 {
-                    initialLeftHandPosition = leftHandGlobalPosition;
+                    _initialLeftHandPosition = leftHandGlobalPosition;
                 }
 
-                PlayerControllerTransform.transform.position += initialLeftHandPosition - leftHandGlobalPosition;
+                playerControllerTransform.transform.position += _initialLeftHandPosition - leftHandGlobalPosition;
 
-                if (!chainSoundPlayed)
+                if (!_chainSoundPlayed)
                 {
                     AudioManager.Instance.PlayAudio("chain");
-                    chainSoundPlayed = true;
+                    _chainSoundPlayed = true;
                 }
             }
             else
             {
-                initialLeftHandPosition = Vector3.zero;
-                chainSoundPlayed = false;
+                _initialLeftHandPosition = Vector3.zero;
+                _chainSoundPlayed = false;
             }
         }
         else
         {
-            if (OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.8f || chainControllers[previousActiveIndex].rightHandGrabAPI.IsHandPalmGrabbing(GrabbingRule.FullGrab))
+            if (OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.8f || chainControllers[_previousActiveIndex].rightHandGrabAPI.IsHandPalmGrabbing(GrabbingRule.FullGrab))
             {
-                Vector3 rightHandGlobalPosition = PlayerControllerTransform.TransformPoint(OVRInput.GetLocalControllerPosition(OVRInput.Controller.RHand));
-                
-                if (initialRightHandPosition == Vector3.zero)
+                Vector3 rightHandGlobalPosition = playerControllerTransform.TransformPoint(OVRInput.GetLocalControllerPosition(OVRInput.Controller.RHand));
+
+                if (_initialRightHandPosition == Vector3.zero)
                 {
-                    initialRightHandPosition = rightHandGlobalPosition;
+                    _initialRightHandPosition = rightHandGlobalPosition;
                 }
 
-                PlayerControllerTransform.transform.position += initialRightHandPosition - rightHandGlobalPosition;
+                if (Vector3.Distance(playerControllerTransform.transform.position, playerControllerTransform.transform.position + _initialRightHandPosition - rightHandGlobalPosition) < 0.1)
+                {
+                    playerControllerTransform.transform.position += _initialRightHandPosition - rightHandGlobalPosition;
+                }
 
-                if (!chainSoundPlayed)
+                if (!_chainSoundPlayed)
                 {
                     AudioManager.Instance.PlayAudio("chain");
-                    chainSoundPlayed = true;
+                    _chainSoundPlayed = true;
                 }
             }
             else
             {
-                initialRightHandPosition = Vector3.zero;
-                chainSoundPlayed = false;
+                _initialRightHandPosition = Vector3.zero;
+                _chainSoundPlayed = false;
             }
         }
     }

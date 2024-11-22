@@ -1,9 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 public class LetterEnigma : MonoBehaviour
 {
     private static LetterEnigma _instance;
@@ -27,11 +25,10 @@ public class LetterEnigma : MonoBehaviour
             StartCoroutine(TeleportToHospital());
         }
     }
-    
+
     private IEnumerator TeleportToHospital()
     {
         yield return new WaitForSeconds(2);
         SceneManager.LoadScene("Hospital");
     }
-    
 }

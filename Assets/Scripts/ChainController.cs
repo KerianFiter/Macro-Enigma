@@ -1,25 +1,13 @@
-using System;
-using Oculus.Interaction.Input;
-using UnityEngine;
-using UnityEngine.InputSystem.HID;
-using Oculus.Interaction.Grab;
 using Oculus.Interaction.GrabAPI;
-using Unity.VisualScripting;
-
+using UnityEngine;
 public class ChainController : MonoBehaviour
 {
-    SphereCollider sphereCollider;
     public bool isRightHand;
-    public GameObject chain;
+    [SerializeField] private GameObject chain;
 
     public bool isColliding, isRepeatable;
     public HandGrabAPI rightHandGrabAPI, leftHandGrabAPI;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Awake()
-    {
-        sphereCollider = GetComponent<SphereCollider>();
-    }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -44,11 +32,5 @@ public class ChainController : MonoBehaviour
         {
             isRepeatable = true;
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

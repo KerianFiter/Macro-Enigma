@@ -1,8 +1,5 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
-
 public class HeadColliderDetector : MonoBehaviour
 {
     [SerializeField] private Transform objectToDetect;
@@ -16,10 +13,11 @@ public class HeadColliderDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        print("trigger enter");
         if (other.transform == objectToDetect)
         {
             HeadColliderTriggerModifier headColliderTriggerModifier = null;
-            other.TryGetComponent<HeadColliderTriggerModifier>(out headColliderTriggerModifier );
+            other.TryGetComponent(out headColliderTriggerModifier);
             if (headColliderTriggerModifier != null)
             {
                 if (!headColliderTriggerModifier.isCollisionEnabled)

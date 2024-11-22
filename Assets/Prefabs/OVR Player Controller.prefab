@@ -238,6 +238,8 @@ MonoBehaviour:
   speed: 600
   headCollider: {fileID: 8601124858810605392}
   headTransform: {fileID: 3546272597369291501}
+  footStepMinDelay: 1
+  footStepMaxDelay: 1.5
 --- !u!82 &2774980025207805971
 AudioSource:
   m_ObjectHideFlags: 0

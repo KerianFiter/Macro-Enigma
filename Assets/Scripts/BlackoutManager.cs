@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
-
+using UnityEngine.Rendering;
 public class BlackoutManager : MonoBehaviour
 {
     public static BlackoutManager Instance;
@@ -24,43 +21,43 @@ public class BlackoutManager : MonoBehaviour
     {
         RenderSettings.fog = false;
         RenderSettings.ambientLight = Color.black;
-        RenderSettings.defaultReflectionMode = UnityEngine.Rendering.DefaultReflectionMode.Custom;
-        foreach (var item in disableOnBlackout)
+        RenderSettings.defaultReflectionMode = DefaultReflectionMode.Custom;
+        foreach (GameObject item in disableOnBlackout)
         {
             item.SetActive(false);
         }
-        foreach (var item in disableOnBlackoutRenderers)
+        foreach (MeshRenderer item in disableOnBlackoutRenderers)
         {
             item.enabled = false;
         }
-        foreach (var item in enableOnBlackout)
+        foreach (GameObject item in enableOnBlackout)
         {
             item.SetActive(true);
         }
     }
-    
+
     public void LightsOn()
     {
         RenderSettings.fog = true;
         RenderSettings.ambientLight = ambiantColor;
-        RenderSettings.defaultReflectionMode = UnityEngine.Rendering.DefaultReflectionMode.Skybox;
-        foreach (var item in disableOnBlackout)
+        RenderSettings.defaultReflectionMode = DefaultReflectionMode.Skybox;
+        foreach (GameObject item in disableOnBlackout)
         {
             item.SetActive(true);
         }
-        foreach (var item in enableOnBlackout)
+        foreach (GameObject item in enableOnBlackout)
         {
             item.SetActive(false);
         }
-        foreach (var item in enableOnLightsOn)
+        foreach (GameObject item in enableOnLightsOn)
         {
             item.SetActive(true);
         }
-        foreach (var item in disableOnLightsOn)
+        foreach (GameObject item in disableOnLightsOn)
         {
             item.SetActive(false);
         }
-        foreach (var item in disableOnBlackoutRenderers)
+        foreach (MeshRenderer item in disableOnBlackoutRenderers)
         {
             item.enabled = true;
         }

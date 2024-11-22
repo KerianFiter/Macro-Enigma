@@ -1,79 +1,84 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
-
 public class ControllerScript : MonoBehaviour
 {
-    public float speed = 5.0f;
-    private Rigidbody rb;
-    public CapsuleCollider headCollider;
-    public Transform headTransform;
-    public float footStepMinDelay = 1f;
-    public float footStepMaxDelay = 1.5f;
-    private bool isMoving = false;
-    private Coroutine footstepCoroutine;
+
+    [SerializeField] private float speed = 5.0f;
+    [SerializeField] private CapsuleCollider headCollider;
+    [SerializeField] private Transform headTransform;
+    [SerializeField] private float footStepMinDelay = 1f;
+    [SerializeField] private float footStepMaxDelay = 1.5f;
+    private Coroutine _footstepCoroutine;
+    private bool _isMoving;
+    private Rigidbody _rb;
+    private Quaternion _targetRotation;
 
     // Start is called before the first frame update
-    void Awake()
+    private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        _rb = GetComponent<Rigidbody>();
+        _targetRotation = transform.rotation;
     }
 
+
+
     // Update is called once per frame
-    void FixedUpdate()
+    private void Update()
     {
         Vector2 thumbstick = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
-    
+
         // Set collider trigger based on thumbstick movement
         headCollider.isTrigger = thumbstick == Vector2.zero;
 
         // Calculate movement based on head forward direction
-        float step = Time.fixedTime * speed;
+        float step = Time.deltaTime * speed;
         Vector3 forward = headTransform.forward * thumbstick.y * step;
         Vector3 right = headTransform.right * thumbstick.x * step;
         Vector3 movement = forward + right;
 
-        rb.AddForce(movement, ForceMode.Impulse);
+        _rb.AddForce(movement, ForceMode.VelocityChange);
 
         // Check if player is moving
-        isMoving = movement.magnitude > 0.01f;
+        _isMoving = movement.magnitude > 0.01f;
 
         // Start or stop the footstep sound coroutine based on movement
-        if (isMoving && footstepCoroutine == null)
+        if (_isMoving && _footstepCoroutine == null)
         {
-            footstepCoroutine = StartCoroutine(PlayFootstepSound());
+            _footstepCoroutine = StartCoroutine(PlayFootstepSound());
         }
-        else if (!isMoving && footstepCoroutine != null)
+        else if (!_isMoving && _footstepCoroutine != null)
         {
-            StopCoroutine(footstepCoroutine);
-            footstepCoroutine = null;
+            StopCoroutine(_footstepCoroutine);
+            _footstepCoroutine = null;
         }
 
         // Rotate the player based on button presses
         if (OVRInput.GetDown(OVRInput.RawButton.X))
         {
-            transform.rotation *= Quaternion.Euler(0, -30, 0);
+            _targetRotation *= Quaternion.Euler(0, -30, 0);
         }
         if (OVRInput.GetDown(OVRInput.RawButton.Y))
         {
-            transform.rotation *= Quaternion.Euler(0, 30, 0);
+            _targetRotation *= Quaternion.Euler(0, 30, 0);
         }
         if (OVRInput.GetDown(OVRInput.Button.SecondaryThumbstickLeft))
         {
-            transform.rotation *= Quaternion.Euler(0, -30, 0);
+            _targetRotation *= Quaternion.Euler(0, -30, 0);
         }
         if (OVRInput.GetDown(OVRInput.Button.SecondaryThumbstickRight))
         {
-            transform.rotation *= Quaternion.Euler(0, 30, 0);
+            _targetRotation *= Quaternion.Euler(0, 30, 0);
         }
+
+        transform.rotation = _targetRotation;
     }
 
     private IEnumerator PlayFootstepSound()
     {
-        while (isMoving)
+        while (_isMoving)
         {
             AudioManager.Instance.PlayAudio("footSteps");
-            
+
             float randomStepDelay = Random.Range(footStepMinDelay, footStepMaxDelay);
             yield return new WaitForSeconds(randomStepDelay);
         }

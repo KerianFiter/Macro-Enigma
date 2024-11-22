@@ -1,32 +1,23 @@
 using System.Collections;
 using UnityEngine;
-
 public class ChoiceEndingScript : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
 
-    public GameObject reality, dream, door_closed, door_opened, pills, mask, beep;
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField] private GameObject reality, dream;
+    [SerializeField] private GameObject doorClosed;
+    [SerializeField] private GameObject doorOpened;
+    [SerializeField] private GameObject pills, mask, beep;
+    [SerializeField] private EndCredits endCredits;
 
     public void ChooseDream()
     {
         mask.SetActive(false);
         pills.SetActive(false);
 
-        // TODO: Fondu au noir
-
         reality.SetActive(false);
         dream.SetActive(true);
         beep.GetComponent<AudioSource>().Stop();
+        StartCoroutine(ShowCreditsCoroutine());
     }
 
     public void ChooseReality()
@@ -37,16 +28,14 @@ public class ChoiceEndingScript : MonoBehaviour
         dream.SetActive(false);
         reality.SetActive(true);
 
-        // TODO: Fondu au blanc
-
-        door_closed.SetActive(false);
-        door_opened.SetActive(true);
+        doorClosed.SetActive(false);
+        doorOpened.SetActive(true);
+        StartCoroutine(ShowCreditsCoroutine());
     }
 
-    IEnumerator showCredits()
+    private IEnumerator ShowCreditsCoroutine()
     {
         yield return new WaitForSeconds(5);
-
-
+        endCredits.StartTextSequence();
     }
 }

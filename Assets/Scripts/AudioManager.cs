@@ -1,39 +1,24 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
-
+using Random = UnityEngine.Random;
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
-    
-    // Define a struct to store the AudioClip, ID, and delay pair
-    [System.Serializable]
-    public struct AudioDelayPair
-    {
-        public string id;
-        public List<AudioClip> audioClip; 
-        public float delay;  
-        public float volume;
-        public bool spatialize;
-        public Transform spatializeTransform;
-        public bool playOnlyOnce;
-        public bool loop;
-    }
 
     [SerializeField]
     private List<AudioDelayPair> audioDelayPairs = new List<AudioDelayPair>();
     private Dictionary<string, AudioDelayPair> _audioDictionary;
     private AudioSource _backgroundAudioSource;
-    
-    void Awake()
+
+    private void Awake()
     {
         Instance = this;
         _audioDictionary = new Dictionary<string, AudioDelayPair>();
-        foreach (var pair in audioDelayPairs)
+        foreach (AudioDelayPair pair in audioDelayPairs)
         {
             if (!_audioDictionary.ContainsKey(pair.id))
             {
@@ -46,18 +31,22 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    void Start()
+    private void Start()
     {
-        if(SceneManager.GetActiveScene().name == "Main")
+        if (SceneManager.GetActiveScene().name == "Main")
         {
             PlayAudio("ou_est_ce_que_jai_aterri");
             PlayAudio("BGNoLights");
-            
+
         }
-        else if(SceneManager.GetActiveScene().name == "Underwater")
+        else if (SceneManager.GetActiveScene().name == "Underwater")
         {
             PlayAudio("BG");
             PlayAudio("leviathan");
+        }
+        else if (SceneManager.GetActiveScene().name == "Hospital")
+        {
+            PlayAudio("breathe");
         }
 
     }
@@ -72,7 +61,7 @@ public class AudioManager : MonoBehaviour
         if (_audioDictionary.ContainsKey(id))
         {
             AudioDelayPair pair = _audioDictionary[id];
-            if(PlayerPrefs.HasKey(id) && pair.playOnlyOnce)
+            if (PlayerPrefs.HasKey(id) && pair.playOnlyOnce)
             {
                 yield break;
             }
@@ -91,9 +80,9 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void PlayClip(AudioClip clip, bool loop, bool spatialize, Transform spatializeTransform, float volume = 1.0f,  bool background = false)
+    private void PlayClip(AudioClip clip, bool loop, bool spatialize, Transform spatializeTransform, float volume = 1.0f, bool background = false)
     {
-        if(background && _backgroundAudioSource != null)
+        if (background && _backgroundAudioSource != null)
         {
             Destroy(_backgroundAudioSource);
         }
@@ -107,7 +96,7 @@ public class AudioManager : MonoBehaviour
             _backgroundAudioSource = audioSource;
         }
         if (spatialize)
-        { 
+        {
             audioSource.spatialBlend = 1.0f;
         }
         audioSource.spatialize = spatialize;
@@ -119,5 +108,19 @@ public class AudioManager : MonoBehaviour
         {
             Destroy(audioSource, clip.length);
         }
+    }
+
+    // Define a struct to store the AudioClip, ID, and delay pair
+    [Serializable]
+    public struct AudioDelayPair
+    {
+        public string id;
+        public List<AudioClip> audioClip;
+        public float delay;
+        public float volume;
+        public bool spatialize;
+        public Transform spatializeTransform;
+        public bool playOnlyOnce;
+        public bool loop;
     }
 }
